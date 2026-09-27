@@ -88,11 +88,11 @@ class QualityChecker:
         if frame is None or frame.size == 0:
             raise ValueError("frame must be a non-empty image")
         observation = self._observations.setdefault(track.track_id, _Observation())
-        observation.areas.append(track.area)
         if is_blurry or track.is_occluded:
             result = self._build_result(track.track_id, observation, is_blurry, False)
             self._latest_results[track.track_id] = result
             return result
+        observation.areas.append(track.area)
         observation.sample_count += 1
         observation.orientation_aligned = (
             observation.orientation_aligned and orientation.is_aligned
