@@ -108,17 +108,22 @@ loading uses `st.cache_resource`.
 
 ## 5. Dataset and training
 
-The detector requires a one-class YOLOv8 dataset. See
-[`dataset/README.md`](../dataset/README.md). The training command is:
+The detector uses a one-class YOLOv8 dataset. See
+[`dataset/README.md`](../dataset/README.md). The repository includes a small
+custom demo model and a clean synthetic conveyor video for an immediately
+runnable demonstration. Those assets are not a substitute for real evaluation
+on the project's target camera.
+
+For real training, use:
 
 ```bash
 yolo task=detect mode=train model=yolov8n.pt \
     data=dataset/data.yaml epochs=30 imgsz=640
 ```
 
-The resulting weights must be copied to `models/box_detector.pt`. The model
-must be validated on conveyor frames containing lighting variation, blur,
-partial occlusion, empty belt intervals, and worker distractors.
+Copy the resulting weights to `models/box_detector.pt` and validate them on
+conveyor frames containing lighting variation, blur, partial occlusion, empty
+belt intervals, and worker distractors.
 
 ## 6. Testing strategy
 

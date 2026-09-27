@@ -7,17 +7,19 @@ quality checks, exactly-once counting, and a Streamlit dashboard.
 
 ## Project status
 
-The seven-stage pipeline, Streamlit runtime, tests, central configuration, and
-academic documentation are implemented. The final detector and sample video
-remain external runtime assets:
+The seven-stage pipeline, Streamlit runtime, tests, central configuration,
+academic documentation, and runnable demo assets are implemented. The
+repository now includes:
 
 ```text
 models/box_detector.pt
 assets/sample_video.mp4
 ```
 
-The detector must be trained on a real single-class `cardboard_box` dataset.
-People are never counted or quality-checked.
+The included demo weights are a custom one-class detector trained on the
+bundled synthetic cardboard-box exercise data so the application can run
+immediately. For a final academic accuracy claim, replace them with weights
+trained on real conveyor frames. People are never counted or quality-checked.
 
 ## Installation
 

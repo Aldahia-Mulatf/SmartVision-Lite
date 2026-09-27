@@ -60,6 +60,25 @@ def _save_uploaded_file(uploaded_file: Any) -> Path:
     return destination
 
 
+def _persist_uploaded_file(uploaded_file: Any) -> Path:
+    """Persist an upload across Streamlit reruns and return its validated path."""
+    _validate_uploaded_file(uploaded_file)
+    signature = (
+        str(getattr(uploaded_file, "name", "")),
+        int(getattr(uploaded_file, "size", 0) or 0),
+    )
+    stored_signature = st.session_state.get("uploaded_signature")
+    stored_path = st.session_state.get("uploaded_video_path")
+    if stored_signature == signature and stored_path:
+        candidate = Path(str(stored_path))
+        if candidate.is_file():
+            return validate_video_path(candidate)
+    destination = _save_uploaded_file(uploaded_file)
+    st.session_state["uploaded_signature"] = signature
+    st.session_state["uploaded_video_path"] = str(destination)
+    return validate_video_path(destination)
+
+
 def _render_summary(summary: ProcessingSummary) -> None:
     """Render the output video, four metrics, and download control."""
     st.subheader("Processed monitoring video")
@@ -79,9 +98,14 @@ def _render_summary(summary: ProcessingSummary) -> None:
 
 
 def _select_input_video(uploaded_file: Any) -> Path | None:
-    """Resolve an uploaded video or the configured default sample video."""
+    """Resolve an upload, persisted upload, or default sample video."""
     if uploaded_file is not None:
-        return _save_uploaded_file(uploaded_file)
+        return _persist_uploaded_file(uploaded_file)
+    stored_path = st.session_state.get("uploaded_video_path")
+    if stored_path:
+        candidate = Path(str(stored_path))
+        if candidate.is_file():
+            return validate_video_path(candidate)
     default_path = config.ASSETS_DIR / "sample_video.mp4"
     if default_path.is_file():
         return validate_video_path(default_path)
@@ -101,8 +125,18 @@ def main() -> None:
                 extension.lstrip(".")
                 for extension in config.SUPPORTED_VIDEO_EXTENSIONS
             ],
+            key="video_upload",
         )
-        if uploaded_file is None:
+        if uploaded_file is not None:
+            try:
+                selected_path = _persist_uploaded_file(uploaded_file)
+                st.success(f"Selected: {selected_path.name}")
+            except VideoValidationError as error:
+                LOGGER.error("Upload validation error: %s", error)
+                st.error(str(error))
+        elif st.session_state.get("uploaded_video_path"):
+            st.success("Uploaded video is ready. Press Run monitoring.")
+        else:
             st.info("No upload selected. The app will use assets/sample_video.mp4.")
         run_monitoring = st.button("Run monitoring", type="primary")
 

@@ -51,5 +51,8 @@ yolo task=detect mode=train model=yolov8n.pt \
 models/box_detector.pt
 ```
 
-The model file is intentionally not created by the scaffold. A custom model
-must be produced from real annotations before the final demonstration.
+A runnable demo model is included at `models/box_detector.pt`. It is trained
+on generated single-class exercise images so the repository can be executed
+without waiting for an external download. For the final academic
+presentation, replace it with weights trained and evaluated on real conveyor
+annotations; do not use the demo metrics as a real-world accuracy claim.
