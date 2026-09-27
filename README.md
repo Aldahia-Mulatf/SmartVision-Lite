@@ -1,17 +1,27 @@
 # SmartVision Lite — Carton Box Monitoring
 
 SmartVision Lite is an academic computer-vision pipeline for monitoring
-cardboard shipping boxes moving on a conveyor belt. The final system will use
-classical image processing, a custom YOLOv8 detector, tracking, orientation
-estimation, quality checks, counting, and a Streamlit dashboard.
+cardboard shipping boxes moving on a conveyor belt. The system uses classical
+image processing, a custom YOLOv8 detector, tracking, orientation estimation,
+quality checks, exactly-once counting, and a Streamlit dashboard.
 
-## Current status
+## Project status
 
-The repository scaffold and central configuration are ready. The final custom
-model is **not** included yet because it must be trained on a real, single-class
-`cardboard_box` dataset.
+The seven-stage pipeline, Streamlit runtime, tests, central configuration, and
+academic documentation are implemented. The final detector and sample video
+remain external runtime assets:
 
-## First setup
+```text
+models/box_detector.pt
+assets/sample_video.mp4
+```
+
+The detector must be trained on a real single-class `cardboard_box` dataset.
+People are never counted or quality-checked.
+
+## Installation
+
+Python 3.10 or newer is recommended.
 
 ```bash
 python -m venv .venv
@@ -32,11 +42,43 @@ annotation rules, and training command. After training, place the weights at:
 models/box_detector.pt
 ```
 
-The final detector must contain only the `cardboard_box` class. People are not
-an analysis class and must never be counted or quality-checked.
+The final detector must contain only the `cardboard_box` class. The temporary
+`agnostic` mode is available in the detector API for early tests but is not
+acceptable for the final presentation.
 
-## Planned runtime
+## Run the dashboard
 
-The application entry point will be `app.py` and will process a complete
-pre-recorded video before presenting the annotated output through Streamlit.
-It will not use a live frame-by-frame `st.image` loop.
+Place a conveyor video at `assets/sample_video.mp4`, or upload one from the
+sidebar, then run:
+
+```bash
+streamlit run app.py
+```
+
+The app processes the complete video, writes
+`outputs/monitored_<timestamp>.mp4`, displays it with `st.video`, shows four
+metrics, and provides a download button.
+
+## Run tests
+
+```bash
+pytest -q
+```
+
+## Repository map
+
+```text
+app.py                      Streamlit entry point
+config.py                   Central constants and calibration
+pipeline/preprocessor.py   Resize, CLAHE, blur score
+pipeline/detector.py       YOLO detection and class filtering
+pipeline/tracker.py        Track association and occlusion
+pipeline/orientation.py    minAreaRect orientation
+pipeline/quality_checker.py Track-level quality rules
+pipeline/counter.py        Counting-line logic
+pipeline/visualizer.py     OpenCV annotations
+pipeline/runner.py         Complete-video orchestration
+utils/                     Video I/O, logging, common helpers
+tests/                     Unit and integration tests
+docs/                      Report and presentation outline
+```
