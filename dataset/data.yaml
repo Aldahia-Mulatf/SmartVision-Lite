@@ -1,0 +1,8 @@
+# YOLOv8 dataset configuration for SmartVision Lite.
+# Update the paths if the dataset is stored outside this repository.
+path: .
+train: images/train
+val: images/val
+
+names:
+  0: cardboard_box

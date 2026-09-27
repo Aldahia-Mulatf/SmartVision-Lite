@@ -1,0 +1,28 @@
+# Python caches and local environments.
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+env/
+
+# Local configuration and editor files.
+.env
+.vscode/
+.idea/
+.DS_Store
+
+# Generated runtime output. Keep the directory marker tracked.
+outputs/*
+!outputs/.gitkeep
+
+# Ultralytics training output and local experiment artifacts.
+runs/
+wandb/
+
+# Large, locally downloaded dataset files.
+dataset/images/
+dataset/labels/
+
+# Temporary Streamlit uploads.
+.streamlit/
